@@ -1,0 +1,5 @@
+*.mex*
+*.slxc
+*.asv
+slprj/*
+fig/*
