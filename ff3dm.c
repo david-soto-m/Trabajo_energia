@@ -1,19 +1,13 @@
-#define S_FUNCTION_NAME ctrl_V_solar
+#define S_FUNCTION_NAME ff3dm
 #define S_FUNCTION_LEVEL 2
 
 #define TPWM Tsampling //Tpwm en seg
 
 #include "simstruc.h"
-#define Tsampling 0.001666
+#define Tsampling 0.0005
 
 #include "lib/ffm_3d_modulator.h"
 
-// BEGIN Globals
-float V_hat_l_1;
-float P_ref_i_l_1;
-float P_hat_l_1;
-float i_hat_l_1;
-// END
 
 static void mdlInitializeSizes(SimStruct *S)
 {
@@ -55,12 +49,7 @@ static void mdlInitializeSampleTimes(SimStruct *S)
 
 #define MDL_START
 #if defined(MDL_START)
-static void mdlStart(SimStruct *S) {
-    V_hat_l_1 = 0;
-    P_ref_i_l_1 = 0;
-    i_hat_l_1 = 0;
-    P_hat_l_1 = 0;
-}
+static void mdlStart(SimStruct *S) {}
 #endif
 
 static void mdlOutputs(SimStruct *S, int_T tid)
@@ -87,43 +76,12 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     V_c3 = *pV_cond[2];
     V_c1_ref = *pV_cond_ref[0];
     V_c2_ref = *pV_cond_ref[1];
-    V_c3_ref = * pV_cond_ref[2];
-
-    P_dc = pow(V_c1 + V_c2 + V_c3, 2);
-    P_dc_ref = pow(V_c1_ref + V_c2_ref + V_c3_ref, 2);
-    // END
-
-    // BEGIN Outer
-    float P_ref_i;
-    float P_hat = P_dc_ref - P_dc;
-    float Kp_outer, Ki_outer;
-    Kp_outer = 3.0 / 50.0;
-    Ki_outer = 10;
-    P_ref_i = Kp_outer * P_hat + (Ki_outer * Tsampling - Kp_outer) * P_hat_l_1 + P_ref_i_l_1;
-    P_ref_i_l_1 = P_ref_i;
-    P_hat_l_1 = P_hat;
-    // BEGIN Transition
-    float i_hat;
-    i_hat = - P_ref_i * V_grid / pow(230, 2) - I_ab;
-
-    // END
-
-    // BEGIN Inner
-    float Kp_inner, Ki_inner;
-    float V_hat;
-    float V_ab_ref;
-    Kp_inner = 5;
-    Ki_inner =  0;
-    V_hat = Kp_inner * i_hat + (Ki_inner * Tsampling - Kp_inner) * i_hat_l_1 + V_hat_l_1;
-    V_hat_l_1 = V_hat;
-    i_hat_l_1 = i_hat;
-    V_ab_ref = (- V_hat + V_grid);
-    // END Inner
+    V_c3_ref = *pV_cond_ref[2];
 
     // BEGIN Modulator
     ffm_3d_args args = {
       .I_ab = I_ab,
-      .V_ab_ref = V_ab_ref,
+      .V_ab_ref = V_grid,
       .V_c = {V_c1, V_c2, V_c3},
       .V_c_ref = {V_c1_ref, V_c2_ref, V_c3_ref},
     };

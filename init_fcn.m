@@ -1,7 +1,8 @@
-mex ctrl_V_solar.c lib/ffm_3d_modulator.c;
+mex ff3dm.c lib/ffm_3d_modulator.c;
 
 Tint = 1e-6;
-Ts = 0.001666;
+Ts = 0.0005;
+% 2 khz ↑
 
 L_s = 5e-3;
 V_source = 230 * sqrt(2);
