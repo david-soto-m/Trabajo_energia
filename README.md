@@ -8,10 +8,12 @@
 Los marcados como prescindibles pueden eliminarse a petición.
 
 - Vdc_H{1, 2 , 3}
+- Idc_H{1, 2 , 3}
 - Vac_H{1, 2 , 3} **Prescindible**
 - I_ab
 - V_s **Prescindible**
 - V_grid
+- I_grid
 - d_{1, 2, 3}
 - Triag
 - refs **Prescindible**
@@ -25,5 +27,5 @@ Los marcados como prescindibles pueden eliminarse a petición.
 | C_load   | condensador de las placas            |       50 mF |
 | C_init_v | Tensión inicial de los condensadores |       300 V |
 | Irr      | Irradiancia                          | 1000 W/m**2 |
-| T_ext    | Temperatura externa                  |       25 ºC |
+| T_ext    | Temperatura externa                  |       15 ºC |
 | shift    | Grados para el interleaving          |        60 º |
