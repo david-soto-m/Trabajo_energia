@@ -1,5 +1,6 @@
 %% Compile
 mex ff3dm.c lib/ffm_3d_modulator.c;
+mex MPPT.c;
 
 %% Time related
 Tint = 5e-5; % s
