@@ -2,11 +2,11 @@
 mex ff3dm.c lib/ffm_3d_modulator.c;
 
 %% Time related
-Tsim = 40;
+Tsim = 20;
 Tint = 5e-5; % s
 Ts = 0.0005; % s
 % 2 khz ↑
-T_pred = Ts*20; % Tendría que escoger esto, yo vería 0.02 o como mucho 0.001
+T_pred = Ts*100; % Tendría que escoger esto, yo vería 0.02 o como mucho 0.001
 T_Enable = 0.35;
 
 %% Exterior
@@ -43,11 +43,11 @@ ss2 = c2d(ss2c, T_pred, 'tustin'); % En ecuaciónes de estado discretas
 % Tm = Ts*20; % Tiempo de muestreo del control
 nx = size(ss2.A,2); % Numero de estados
 nu = size(ss2.B,2); % Numero de acciones de control
-lambda = 0.4;
+lambda = 10;
 U0 = 0;
 X0 = 0;
 Kobs = 1;
-N2 = 5; % Horizonte de prQediccion
+N2 = 10; % Horizonte de prQediccion
 Nu = 5; % Horizonte de control
 
 model = ss2;
@@ -79,4 +79,4 @@ end
 
 % Accion de control y salida
 K1 = inv(H'*H + lambda*eye(Nu))*H';
-K = K1(1,:); % Solo interesa la primera fila
+K = K1(1,:)/T_pred; % Solo interesa la primera fila
