@@ -13,19 +13,6 @@ datas = {
     out.I_ab, "Intensidad AB", ["Voltios", sec_str], [], [];
 };
 pl.deal_datas(datas, [2, 2], "Proyecto_1_1");
-datas = {
-    V_dc_follow, "Tensión del condensador 2", ["Voltios", sec_str], frec, [];
-    out.V_s, "Tensión AB", ["Voltios", sec_str], frec, [];
-    out.V_acs, "Tensiónes parciales", ["Voltios", sec_str], frec, [];
-    out.I_ab, "Intensidad AB", ["Voltios", sec_str], frec, [];
-};
-pl.deal_datas(datas, [2, 2], "Proyecto_1_2");
-frec = [2, 2000];
-datas = {
-    out.V_s, "Tensión AB", ["Voltios", sec_str], frec, [];
-    out.V_acs, "Tensiónes parciales", ["Voltios", sec_str], frec, [];
-};
-pl.deal_datas(datas, [2, 1], "Proyecto_1_3");
 %% End
 pause
 close all
