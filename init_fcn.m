@@ -1,5 +1,6 @@
 %% Compile
 mex ff3dm.c lib/ffm_3d_modulator.c;
+mex MPPT.c;
 
 %% Time related
 Tsim = 40;
@@ -17,7 +18,7 @@ Irr = 1000; % W / m^2
 V_source = 230 * sqrt(2); % Volt
 C_load = 5e-2; % 50mF
 L_s = 5e-3; % 5mH
-C_init_v = 317; %Volt
+C_init_v = 315; %Volt
 shift = (180/3)/360 * Ts; %deg
 
 %% Room
@@ -56,7 +57,7 @@ Temp_ref = [20*ones(Tsim/(T_pred*2),1); 25*ones(Tsim/(T_pred*2),1)];
 
 M = [model.A model.B; zeros(nu,nx) eye(nu)];
 N = [model.B; eye(nu)];
-Q = [model.C zeros(1,nu)]; % zeros(ny,nu)
+Q = [model.C zeros(1,nu)]; %     zeros(ny,nu)
 
 % y_pred = F* x_pred + H *U
 % Calculamos F = [Q*M; Q*M^2; ....; Q*M^(N2)

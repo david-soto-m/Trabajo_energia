@@ -2,18 +2,29 @@
 pl = plot_class();
 sec_str = "Segundos";
 %% Plot
-out = sim("proyecto.slx");
-frec = [4, 50];
-V_dc_follow = out.V_dcs;
-V_dc_follow.signals.values = V_dc_follow.signals.values(:,[2,5]);
+% out = sim("proyecto.slx");
 datas = {
-    out.V_dcs, "Tensiónes de los condensadores", ["Voltios", sec_str], [], [];
-    out.V_s, "Tensión AB", ["Voltios", sec_str], [], [];
-    out.V_acs, "Tensiónes parciales", ["Voltios", sec_str], [], [];
-    out.I_ab, "Intensidad AB", ["Voltios", sec_str], [], [];
+    out.T_room, "Temperatura", ["ºC", sec_str], [], ["referencia", "real"];
+    out.V_room, "Tensión", ["Voltios", sec_str], [], ["referencia", "real"];
+    out.P_room, "Potencia", ["Watios", sec_str], [], [];
 };
-pl.deal_datas(datas, [2, 2], "Proyecto_1_1");
+pl.deal_datas(datas, [3, 1], "MPC/Temps");
+datas = {
+%     out.V_dcs, "Voltajes de las placas", ["Voltios", sec_str], [0.01, Tsim - 0.01, 1], [];
+    out.V_dcs, "Voltajes de las placas", ["Voltios", sec_str], [4, 5], [];
+    out.V_s, "Voltajes de salida", ["Voltios", sec_str], [4, 50], [];
+%     out.V_room, "Tensión", ["Voltios", sec_str], [], ["referencia", "real"];
+%     out.P_room, "Potencia", ["Watios", sec_str], [], [];
+};
+pl.deal_datas(datas, [2, 1], "ff/tension");
+
+datas = {
+    out.P_placas, "Potencia de las placas", ["Watios", sec_str], [], [];
+    out.P_room, "Potencia de la habitación", ["Watios", sec_str], [], [];
+    out.P_vol, "Potencia volcada a red", ["Watios", sec_str],[],[];
+};
+pl.deal_datas(datas, [3, 1], "res/pots");
+
 %% End
-pause
 close all
 % clear
