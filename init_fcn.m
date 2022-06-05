@@ -16,7 +16,7 @@ Irr = 1000; % W / m^2
 V_source = 230 * sqrt(2); % Volt
 C_load = 5e-2; % 50mF
 L_s = 5e-3; % 5mH
-C_init_v = 317; %Volt
+C_init_v = 315; %Volt
 shift = (180/3)/360 * Ts; %deg
 
 %% Room

@@ -17,7 +17,7 @@ classdef plot_class
     methods
         function self = plot_class()
             self.box = 'off';
-            self.grid = 'off';
+            self.grid = 'on';
             self.ax_fontsize=20;
             self.font_size = 20;
             self.leg_fontsize=20;

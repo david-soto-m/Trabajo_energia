@@ -22,7 +22,7 @@
 static float Ppv_1 = 0.0, Vpv_1 = 0.0, Ipv_1 = 0.0;
 static float Vmppt_1;
 float Vmppt;
-float inc_Vmppt = 2.0;
+float inc_Vmppt = 5.0;
 
 /*================*
  * Build checking *
@@ -40,7 +40,7 @@ static void mdlInitializeSizes(SimStruct *S)
     }
     
     // Numero entradas
-    if (!ssSetNumInputPorts(S, 2)) return;
+    if (!ssSetNumInputPorts(S, 3)) return;
     //ssSetInputPortWidth(S, 0, DYNAMICALLY_SIZED);
     // Dimension Entrada 0
     ssSetInputPortWidth(S, 0, 1);
@@ -49,6 +49,9 @@ static void mdlInitializeSizes(SimStruct *S)
     // Dimension Entrada 1
     ssSetInputPortWidth(S, 1, 1);
     ssSetInputPortDirectFeedThrough(S, 1, 1);
+    // Dimension Entrada 2
+    ssSetInputPortWidth(S, 2, 1);
+    ssSetInputPortDirectFeedThrough(S, 2, 1);
 
     // Numero salidas
     if (!ssSetNumOutputPorts(S,1)) return;
@@ -90,7 +93,7 @@ static void mdlInitializeSampleTimes(SimStruct *S)
  */
 static void mdlStart(SimStruct *S)
 {
-    Ppv_1 = 8000, Vpv_1 = 320.0, Ipv_1 = 20.0;
+    Ppv_1 = 6000, Vpv_1 = 320.0, Ipv_1 = 20.0;
     Vmppt_1 = 310.0;
 }
 #endif /*  MDL_START */
@@ -109,11 +112,13 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     float inc_Vpv;
     float inc_Ipv;
     float aux_Vmppt;
+    int selector;
     float t = ssGetT(S); /* Actualización del tiempo actual */
 
     //int_T             i;
     InputRealPtrsType pVpv = ssGetInputPortRealSignalPtrs(S,0); // Puntero a la tension (direccion de memoria entrada 0)
     InputRealPtrsType pIpv = ssGetInputPortRealSignalPtrs(S,1); // Puntero a la intensidad (direccion de memoria entrada 1)
+    InputRealPtrsType pSelector = ssGetInputPortRealSignalPtrs(S,2); // Puntero a la intensidad (direccion de memoria entrada 2)
     real_T            *y1    = ssGetOutputPortRealSignal(S,0); // Datos de salida en la direccion de memoria de salida 0
     real_T            *y2    = ssGetOutputPortRealSignal(S,1);
     
@@ -121,6 +126,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     // Pasar del puntero a la variable
     Vpv = *pVpv[0];
     Ipv = *pIpv[0];
+    selector = (int) *pSelector[0];
 
     // Calculo incrementos (comun a ambos metodos)
     Ppv = Vpv*Ipv;
@@ -128,36 +134,78 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     inc_Vpv = Vpv - Vpv_1;
     inc_Ipv = Ipv - Ipv_1;
 
-    // P&O
-    // Incremento de P = 0
-    if (inc_Ppv == 0){
-        Vmppt = Vmppt_1;
-    }
-    else{
-        // Incremento P > 0
-        if (inc_Ppv > 0){
-            // Incremento Vpv > 0 -> Vmppt sube
-            if (inc_Vpv > 0){
-                Vmppt = Vmppt_1 + inc_Vmppt;
+    switch (selector){
+        // P&O
+        case 0:        
+            // Incremento de P = 0
+            if (inc_Ppv == 0){
+                Vmppt = Vmppt_1;
             }
-            // Incremento Vpv < 0 -> Vmppt baja
             else{
-                Vmppt = Vmppt_1 - inc_Vmppt;
+                // Incremento P > 0
+                if (inc_Ppv > 0){
+                    // Incremento Vpv > 0 -> Vmppt sube
+                    if (inc_Vpv > 0){
+                        Vmppt = Vmppt_1 + inc_Vmppt;
+                    }
+                    // Incremento Vpv < 0 -> Vmppt baja
+                    else{
+                        Vmppt = Vmppt_1 - inc_Vmppt;
+                    }
+                }
+                // Incremento P < 0
+                else{
+                    // Incremento Vpv > 0 -> Vmppt baja
+                    if (inc_Vpv > 0){
+                        Vmppt = Vmppt_1 - inc_Vmppt;
+                    }
+                    // Incremento Vpv < 0 -> Vmppt sube
+                    else{
+                        Vmppt = Vmppt_1 + inc_Vmppt;
+                    }
+                }
             }
-        }
-        // Incremento P < 0
-        else{
-            // Incremento Vpv > 0 -> Vmppt baja
-            if (inc_Vpv > 0){
-                Vmppt = Vmppt_1 - inc_Vmppt;
-            }
-            // Incremento Vpv < 0 -> Vmppt sube
-            else{
-                Vmppt = Vmppt_1 + inc_Vmppt;
-            }
-        }
-    }
+            break;
 
+        // Conductancia incremental
+        case 1:
+            // Incremento Vpv = 0
+            if (inc_Vpv == 0){
+                // Incremento Ipv = 0
+                if(inc_Ipv == 0){
+                    Vmppt = Vmppt_1;
+                }
+                // Incremento Ipv =/= 0
+                else{
+                    // Incremento Ipv > 0
+                    if (inc_Ipv > 0){
+                        Vmppt = Vmppt_1 + inc_Vmppt;
+                    }
+                    // Incremento Ipv < 0
+                    else {
+                        Vmppt = Vmppt_1 - inc_Vmppt;
+                    }
+                }
+            }
+            // Incremento Vpv =/= 0
+            else{
+                if ((inc_Ipv/inc_Vpv) == -(Ipv/Vpv)){
+                    Vmppt = Vmppt_1;
+                }
+                else{
+                    if ((inc_Ipv/inc_Vpv) > -(Ipv/Vpv)){
+                        Vmppt = Vmppt_1 + inc_Vmppt;        
+                    }
+                    else {
+                        Vmppt = Vmppt_1 - inc_Vmppt;
+                    }
+                }
+            }
+            break;
+
+        default:
+            Vmppt = -1;
+    }
 
     aux_Vmppt = Vmppt_1;
 
