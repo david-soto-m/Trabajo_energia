@@ -48,7 +48,7 @@ lambda = 0.4;
 U0 = 0;
 X0 = 0;
 Kobs = 1;
-N2 = 5; % Horizonte de prQediccion
+N2 = 5; % Horizonte de prediccion
 Nu = 5; % Horizonte de control
 
 model = ss2;
